@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4 min-vh-100">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold display-5">Minhas Tarefas</h1>
+        <a href="{% url 'task_create' %}" class="btn btn-success btn-lg">
+            <i class="fas fa-plus me-2"></i>Nova Tarefa
+        </a>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="btn-group" role="group">
+                <a href="{% url 'dashboard' %}?filter=all" class="btn btn-outline-light {% if not filter or filter == 'all' %}active bg-primary{% endif %}">
+                    <i class="fas fa-list me-1"></i>Todas
+                </a>
+                <a href="{% url 'dashboard' %}?filter=pending" class="btn btn-outline-warning {% if filter == 'pending' %}active bg-warning text-dark{% endif %}">
+                    <i class="fas fa-clock me-1"></i>Pendentes
+                </a>
+                <a href="{% url 'dashboard' %}?filter=completed" class="btn btn-outline-success {% if filter == 'completed' %}active bg-success{% endif %}">
+                    <i class="fas fa-check me-1"></i>Concluídas
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" id="orderDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-sort me-1"></i>Ordenar por
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="orderDropdown">
+                    <li><a class="dropdown-item {% if order == '-created_at' %}active{% endif %}" href="?order=-created_at{% if filter %}&filter={{ filter }}{% endif %}">Mais Recentes</a></li>
+                    <li><a class="dropdown-item {% if order == 'created_at' %}active{% endif %}" href="?order=created_at{% if filter %}&filter={{ filter }}{% endif %}">Mais Antigas</a></li>
+                    <li><a class="dropdown-item {% if order == 'due_date' %}active{% endif %}" href="?order=due_date{% if filter %}&filter={{ filter }}{% endif %}">Data de Vencimento</a></li>
+                    <li><a class="dropdown-item {% if order == 'title' %}active{% endif %}" href="?order=title{% if filter %}&filter={{ filter }}{% endif %}">Título (A-Z)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- TASKS LIST -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if tasks %}
+        <div class="list-group">
+            {% for task in tasks %}
+                <div class="list-group-item bg-dark text-light border-secondary mb-2 rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1 me-3">
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="badge bg-secondary me-2">{{ forloop.counter }}</span>
+                                <h5 class="mb-0 {% if task.completed %}text-decoration-line-through text-muted{% endif %} fw-bold">
+                                    {{ task.title }}
+                                </h5>
+                            </div>
+                            {% if task.description %}
+                                <p class="mb-2 text-muted">{{ task.description|truncatechars:100 }}</p>
+                            {% endif %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% if task.due_date %}
+                                    <span class="badge {% if task.completed %}bg-success{% else %}bg-info{% endif %} py-2">
+                                        <i class="fas fa-calendar me-1"></i>{{ task.due_date|date:"d/m/Y H:i" }}
+                                    </span>
+                                {% endif %}
+                                <span class="badge {% if task.completed %}bg-success{% else %}bg-warning text-dark{% endif %} py-2">
+                                    <i class="fas {% if task.completed %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                    {% if task.completed %}Concluída{% else %}Pendente{% endif %}
+                                </span>
+                                <span class="badge bg-secondary py-2">
+                                    <i class="fas fa-calendar-plus me-1"></i>Criada em: {{ task.created_at|date:"d/m/Y H:i" }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="btn-group-vertical flex-shrink-0">
+                            <a href="{% url 'task_toggle_complete' task.pk %}" class="btn btn-sm {% if task.completed %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="{% if task.completed %}Marcar como pendente{% else %}Marcar como concluída{% endif %}">
+                                <i class="fas {% if task.completed %}fa-undo{% else %}fa-check{% endif %}"></i>
+                            </a>
+                            <a href="{% url 'task_update' task.pk %}" class="btn btn-sm btn-outline-primary mt-1" title="Editar tarefa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{% url 'task_delete' task.pk %}" class="d-inline mt-1" onsubmit="return confirm('Tem certeza que deseja excluir esta tarefa?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir tarefa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p class="text-muted mb-0">Total de tarefas: {{ tasks.count }}</p>
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-dark rounded-3 border border-secondary">
+            <i class="fas fa-tasks display-1 text-muted mb-3"></i>
+            <h3 class="fw-bold mb-3">Nenhuma tarefa encontrada</h3>
+            <p class="text-muted mb-4">Você não tem tarefas {% if filter == 'pending' %}pendentes{% elif filter == 'completed' %}concluídas{% else %}cadastradas{% endif %}.</p>
+            <a href="{% url 'task_create' %}" class="btn btn-primary px-4 py-2">
+                <i class="fas fa-plus me-2"></i>Criar sua primeira tarefa
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

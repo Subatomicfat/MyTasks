@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5 min-vh-100">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card bg-dark border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas {% if title == 'Nova Tarefa' %}fa-plus-circle text-success{% else %}fa-edit text-info{% endif %} display-3 mb-3"></i>
+                        <h2 class="fw-bold">{{ title }}</h2>
+                        <p class="text-muted">Preencha os detalhes abaixo para {% if title == 'Nova Tarefa' %}criar{% else %}atualizar{% endif %} sua tarefa</p>
+                    </div>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="title" class="form-label fw-bold">Título da Tarefa <span class="text-danger">*</span></label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Dê um nome curto e objetivo para sua tarefa</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-bold">Descrição</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Adicione detalhes extras que ajudem a entender melhor a tarefa</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="due_date" class="form-label fw-bold">Data de Conclusão</label>
+                            {{ form.due_date }}
+                            {% if form.due_date.errors %}
+                                <div class="text-danger small mt-1">{{ form.due_date.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Defina um prazo para conclusão (opcional)</small>
+                        </div>
+                        
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn {% if title == 'Nova Tarefa' %}btn-success{% else %}btn-info{% endif %} py-3 fw-bold fs-5">
+                                <i class="fas {% if title == 'Nova Tarefa' %}fa-save{% else %}fa-sync{% endif %} me-2"></i>
+                                {% if title == 'Nova Tarefa' %}Criar Tarefa{% else %}Atualizar Tarefa{% endif %}
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-light py-3 fw-bold fs-5">
+                                <i class="fas fa-arrow-left me-2"></i>Voltar para o Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

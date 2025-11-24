@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5 min-vh-100">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card bg-dark border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-sign-in-alt display-3 text-primary mb-3"></i>
+                        <h2 class="fw-bold">Entrar no MyTasks</h2>
+                        <p class="text-muted">Acesse sua conta para gerenciar suas tarefas</p>
+                    </div>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="username" class="form-label">Usuário</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="username" name="username" placeholder="Digite seu usuário" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control bg-dark text-light border-secondary" id="password" name="password" placeholder="Digite sua senha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5">Entrar</button>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">Não tem uma conta?</p>
+                        <a href="/register" class="text-primary fw-bold text-decoration-none">Cadastre-se gratuitamente</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
