@@ -5,11 +5,11 @@
 touch mytasks/__init__.py
 touch tasks/__init__.py
 
-# Executa migrações do banco de dados
+# Executa migrações
 python manage.py migrate --noinput
 
-# Coleta arquivos estáticos
+# Coleta arquivos estáticos (agora com STATIC_ROOT configurado)
 python manage.py collectstatic --noinput
 
-# Inicia o servidor Gunicorn
+# Inicia o servidor
 gunicorn mytasks.wsgi:application
