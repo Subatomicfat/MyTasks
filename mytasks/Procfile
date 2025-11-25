@@ -1,0 +1,1 @@
+web: chmod +x render_start.sh && ./render_start.sh
